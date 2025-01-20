@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 public class MatchCards {
     class Card{
@@ -43,13 +45,17 @@ public class MatchCards {
     JPanel textPanel = new JPanel ();
     JPanel boardPanel = new JPanel ();
     JPanel restartGamePanel = new JPanel ();
-    JButton restartButton = new JButton ()
-
+    JButton restartButton = new JButton ();
 
 
     int errorCount =0;
     ArrayList<JButton> board;
 
+    Timer hideCardTimer;
+    boolean gameReady = false;
+
+    JButton card1Selected;
+    JButton card2Selected;
 
     MatchCards() {
        setupCards();
@@ -75,6 +81,36 @@ public class MatchCards {
            tile.setOpaque (true);
            tile.setIcon (cardSet.get (i).cardImageIcon);
            tile.setFocusable (false);
+           tile.addActionListener (new ActionListener () {
+               @Override
+               public void actionPerformed(ActionEvent e) {
+                   if(!gameReady){
+                       return;
+                   }
+                   JButton tile=(JButton) e.getSource ();
+                   if(tile.getIcon ()== cardBackImageIcon){
+                       if(card1Selected==null){
+                           card1Selected=tile;
+                           int index = board.indexOf (card1Selected);
+                           card1Selected.setIcon (cardSet.get (index).cardImageIcon);
+                       } else if (card2Selected ==null) {
+                           card2Selected=tile;
+                           int index= board.indexOf (card2Selected);
+                           card2Selected.setIcon (cardSet.get (index).cardImageIcon);
+
+                           if(card1Selected.getIcon () != card2Selected.getIcon ()){
+                               errorCount+=1;
+                               textLable.setText ("Errors: "+ Integer.toString (errorCount));
+                               hideCardTimer.start ();
+                           }
+                           else {
+                               card1Selected =null;
+                               card2Selected = null;
+                           }
+                       }
+                   }
+               }
+           });
            board.add (tile);
            boardPanel.add (tile);
        }
@@ -85,9 +121,21 @@ public class MatchCards {
         restartButton.setText ("Restart Game");
         restartButton.setPreferredSize (new Dimension (boardWidth,30));
         restartButton.setFocusable (false);
+        restartGamePanel.add (restartButton);
+        frame.add (restartGamePanel,BorderLayout.SOUTH);
 
        frame.pack ();
        frame.setVisible (true);
+
+       //start game
+        hideCardTimer = new Timer (1500, new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                hideCards();
+            }
+        });
+        hideCardTimer.setRepeats (false);
+        hideCardTimer.start ();
     }
 
     void setupCards(){
@@ -118,5 +166,19 @@ public class MatchCards {
             cardSet.set (j, temp);
         }
         System.out.println (cardSet);
+    }
+    void hideCards(){
+        if(gameReady && card1Selected != null && card2Selected != null){
+            card1Selected.setIcon (cardBackImageIcon);
+            card1Selected =null;
+            card2Selected.setIcon (cardBackImageIcon);
+            card2Selected =null;
+
+        }else {
+            for (int i = 0; i < board.size (); i++) {
+                board.get (i).setIcon (cardBackImageIcon);
+            }
+            gameReady = true;
+        }
     }
 }
