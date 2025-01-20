@@ -121,6 +121,7 @@ public class MatchCards {
         restartButton.setText ("Restart Game");
         restartButton.setPreferredSize (new Dimension (boardWidth,30));
         restartButton.setFocusable (false);
+        restartButton.setEnabled (false);
         restartButton.addActionListener (new ActionListener () {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,6 +129,7 @@ public class MatchCards {
                     return;
                 }
                 gameReady =false;
+                restartButton.setEnabled (false);
                 card1Selected= null;
                 card2Selected = null;
                 shuffleCards ();;
@@ -199,6 +201,7 @@ public class MatchCards {
                 board.get (i).setIcon (cardBackImageIcon);
             }
             gameReady = true;
+            restartButton.setEnabled (true);
         }
     }
 }
