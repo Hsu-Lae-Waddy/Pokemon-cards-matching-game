@@ -121,6 +121,26 @@ public class MatchCards {
         restartButton.setText ("Restart Game");
         restartButton.setPreferredSize (new Dimension (boardWidth,30));
         restartButton.setFocusable (false);
+        restartButton.addActionListener (new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!gameReady){
+                    return;
+                }
+                gameReady =false;
+                card1Selected= null;
+                card2Selected = null;
+                shuffleCards ();;
+
+                //re assign button with new cards
+                for (int i=0; i<board.size ();i++){
+                    board.get (i).setIcon (cardSet.get (i).cardImageIcon);
+                }
+                errorCount =0;
+                textLable.setText ("Errors: "+ Integer.toString (errorCount));
+                hideCardTimer.start ();
+            }
+        });
         restartGamePanel.add (restartButton);
         frame.add (restartGamePanel,BorderLayout.SOUTH);
 
